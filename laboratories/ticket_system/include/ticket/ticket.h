@@ -1,13 +1,20 @@
-// Guardas de inclusión exigidas para evitar redefiniciones 
 #ifndef TICKET_H
 #define TICKET_H
 
-// Definición de la estructura usando typedef struct 
 typedef struct {
-    int identificacion;       // Identificación numérica
-    char correo[100];         // Correo electrónico
-    char tipo_reclamacion[50];// Tipo de reclamación 
-    long radicado;            // Número de radicado 
+    int identificacion;
+    char correo[100];
+    char tipo_reclamacion[50];
+    long radicado;
 } Ticket;
 
-#endif // TICKET_H
+// Crea un ticket en memoria dinámica
+Ticket* crear_ticket(int id, const char* correo, const char* tipo);
+
+// Libera la memoria del ticket
+void liberar_ticket(Ticket* t);
+
+// Guarda el ticket en un archivo 
+int guardar_ticket(Ticket* t);
+
+#endif 

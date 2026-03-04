@@ -1,0 +1,11 @@
+================================
+      TICKET DE RECLAMACIÓN     
+================================
+Radicado No:    1772594147
+Fecha registro: 1772593322 (Unix Timestamp)
+--------------------------------
+Identificación: 10135
+Correo:         milton@udea
+Tipo:           Queja
+Estado:         RECIBIDO
+================================
