@@ -1,8 +1,8 @@
-```markdown
 # Sistema de Registro de Tickets en C (Linux)
 
 Este proyecto implementa un sistema de consola en lenguaje C para el registro y gestión de tickets de reclamación. El sistema está diseñado bajo el estándar **C11**, utilizando **memoria dinámica**, **punteros a estructuras** y **persistencia en archivos**.
 
+```markdown
 ## Estructura del Proyecto
 
 El proyecto sigue una arquitectura modular separando la interfaz (headers) de la implementación (sources):
@@ -111,6 +111,3 @@ El `Makefile` fuerza buenas prácticas utilizando:
 * `-std=c11`: Estándar moderno de C.
 * `-Wall -Wextra`: Activa todas las advertencias posibles para garantizar código limpio y seguro.
 
-```
-
----
