@@ -104,11 +104,3 @@ El `Makefile` impone seguridad en la compilación utilizando:
 * `-Iinclude`: Vincula dinámicamente el directorio de cabeceras para mantener los `#include` limpios y sin rutas relativas complejas.
 
 ```
-
----
-
-¡Con esto tu proyecto queda a nivel profesional! Tienes un código C bien estructurado, un Makefile robusto, compilación sin errores, salida perfecta y ahora un README técnico excelente.
-
-¿Quieres que te muestre rápidamente cómo crear un archivo `.gitignore` para que al hacer `git push` no subas los binarios (`mlfq_app` y los `.o`) por accidente?
-
-```
