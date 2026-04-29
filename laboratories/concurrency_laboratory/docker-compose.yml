@@ -1,0 +1,49 @@
+version: '3.8'
+
+# Carga de variables de entorno desde .env
+
+services:
+
+  #BASE DE DATOS
+  image: postgres:15-alpine
+  env_file: .env # lee POSTGRES_USER/PASSWORD/DB de .env
+  ports:
+    - "5432:5432"
+  volumes:
+    - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    - pg_data:/var/lib/postgresql/data
+  healthcheck:
+    test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+    interval: 3s
+    timeout: 5s
+    retries: 10
+  restart: unless-stopped
+
+  #CONTENEDOR DE INICIALIZACIÓN
+  #Servicio dedicado que verifica que la BD tiene datos y termina (exit 0).
+  #Separado de postgres para respetar el principio de responsabilidad única.
+  db-init:
+    image: postgres:15-alpine
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      psql ${DATABASE_URL} -c "SELECT COUNT(*) AS registros_pendientes FROM input WHERE status = 'pending';"
+    restart: "no" # ejecuta una vez y termina
+
+  #WORKERS CONCURRENTES
+  worker:
+    build: .
+    env_file: .env
+    environment:
+      WORKER_NAME: "worker"
+    depends_on:
+      db:
+        condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
+    restart: "no" # el worker termina cuando no hay más datos
+
+volumes:
+  pg_data: # persistencia de la BD entre ejecuciones
