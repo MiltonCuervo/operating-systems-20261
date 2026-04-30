@@ -156,3 +156,18 @@ El código original llamaba `cur.execute("BEGIN")` manualmente luego de un `conn
 
 ### Identificación de workers
 Con `--scale worker=5`, todos los contenedores compartían el mismo valor de `WORKER_NAME: "worker"` definido en el compose, haciendo que los 5 workers aparecieran como uno solo en la tabla `result`. Se eliminó esa variable de entorno para que cada contenedor usara su `HOSTNAME`, que Docker Compose diferencia automáticamente (`...-worker-1`, `-2`, etc.).
+
+---
+
+## 8. Orquestación y Redes en Docker
+
+Para que un sistema distribuido funcione correctamente, la concurrencia en código debe ir acompañada de una buena orquestación de infraestructura. En este laboratorio, Docker Compose aporta dos soluciones vitales:
+
+### 8.1 Aislamiento de Red y Resolución DNS
+Docker Compose crea automáticamente una red virtual tipo `bridge`. Los workers no se conectan a una IP estática, sino al hostname `db`. El DNS interno de Docker resuelve `db` a la IP dinámica del contenedor de PostgreSQL. Esto permite que el sistema sea portátil y que la base de datos se mantenga completamente aislada del exterior, recibiendo conexiones únicamente de los contenedores de su misma red.
+
+### 8.2 Control de Flujo de Inicio (Healthchecks)
+En sistemas distribuidos, la condición de carrera no solo ocurre en los datos, sino en **el tiempo de arranque**. Si los 5 workers inician antes de que PostgreSQL termine de cargar sus archivos internos, el sistema colapsaría. 
+Para solucionarlo, el `docker-compose.yml` implementa:
+1.  **Healthchecks:** Un script interno en el contenedor de BD que ejecuta `pg_isready` cada 3 segundos.
+2.  **Depends_on (service_healthy):** Docker bloquea el inicio de los workers hasta que el healthcheck de la BD devuelva un estado verde (sano). Esto, sumado al *backoff exponencial* en Python, garantiza tolerancia a fallos total en el arranque.
