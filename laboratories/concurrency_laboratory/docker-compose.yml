@@ -1,12 +1,8 @@
-version: '3.8'
-
-# Carga de variables de entorno desde .env
-
 services:
 
   #BASE DE DATOS
   db:
-    image: postgres:15-alpine # <--- Todo esto se indenta hacia adentro
+    image: postgres:15-alpine
     env_file: .env
     ports:
       - "5432:5432"
