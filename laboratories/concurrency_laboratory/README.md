@@ -79,19 +79,25 @@ chmod +x verify_concurrency.sh
 
 ### 5. Consultas manuales de evidencia
 
-```sql
--- Conectar a la BD
-psql postgresql://lab_user:lab_secure_pass_2024@localhost:5432/lab_db
+Postgres corre dentro de Docker, por lo que las consultas se ejecutan con `docker exec`:
 
--- Ver inserciones intercaladas (evidencia clave de concurrencia)
-SELECT worker_identifier, input_id, TO_CHAR(date,'HH24:MI:SS.MS') as ts
-FROM result ORDER BY date LIMIT 20;
+```bash
+# Abrir sesión interactiva en el contenedor de BD
+docker exec -it concurrency_laboratory-db-1 psql -U lab_user -d lab_db
+```
 
--- Verificar que no hay duplicados
-SELECT input_id, COUNT(*) FROM result GROUP BY input_id HAVING COUNT(*) > 1;
+```bash
+# Ver inserciones intercaladas (evidencia clave de concurrencia)
+docker exec -i concurrency_laboratory-db-1 psql -U lab_user -d lab_db -c \
+  "SELECT worker_identifier, input_id, TO_CHAR(date,'HH24:MI:SS.MS') AS ts FROM result ORDER BY date LIMIT 20;"
 
--- Estadísticas por worker
-SELECT worker_identifier, COUNT(*) FROM result GROUP BY worker_identifier;
+# Verificar que no hay duplicados
+docker exec -i concurrency_laboratory-db-1 psql -U lab_user -d lab_db -c \
+  "SELECT input_id, COUNT(*) FROM result GROUP BY input_id HAVING COUNT(*) > 1;"
+
+# Estadísticas por worker
+docker exec -i concurrency_laboratory-db-1 psql -U lab_user -d lab_db -c \
+  "SELECT worker_identifier, COUNT(*) FROM result GROUP BY worker_identifier;"
 ```
 
 ### 6. Limpiar el entorno
@@ -124,8 +130,8 @@ CREATE TABLE result (
 
 **Los workers terminan inmediatamente sin procesar nada**
 ```bash
-# Verificar que la BD tiene datos
-psql postgresql://lab_user:lab_secure_pass_2024@localhost:5432/lab_db \
+# Verificar que la BD tiene datos (Postgres corre en Docker)
+docker exec -i concurrency_laboratory-db-1 psql -U lab_user -d lab_db \
   -c "SELECT COUNT(*) FROM input WHERE status='pending';"
 ```
 
